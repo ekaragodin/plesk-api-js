@@ -40,12 +40,8 @@ test('convert object to xml', async () => {
     const request = createRequestMock(getServerResponse);
     const api = require('../index').api(config);
 
-    return api({
-        server: {
-            get: {
-                stat: {},
-            }
-        }
+    return api('server.get', {
+        stat: {},
     }).then(() => {
         const xml = `
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -68,21 +64,11 @@ test('convert xml to object', async () => {
     createRequestMock(getServerResponse);
     const api = require('../index').api(config);
 
-    return api({
-        server: {
-            get: {
-                stat: {},
-            }
-        }
+    return api('server.get', {
+        stat: {},
     }).then((response) => {
         expect(response).toMatchObject({
-            server: {
-                get: {
-                    result: {
-                        status: 'ok',
-                    }
-                }
-            }
+            status: 'ok',
         });
     });
 });

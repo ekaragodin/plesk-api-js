@@ -1,15 +1,10 @@
-const config = require('./_config');
+const request = require('../index').api(require('./_config'));
 
-const request = require('../index').api(config);
-request({
-    server: {
-        get: {
-            stat: {},
-        }
-    }
+request('server.get', {
+    stat: {}
 })
-.then((response) => {
-    console.log(response.server.get)
+.then((result) => {
+    console.log(result)
 })
 .catch((err) => {
     console.log(err)

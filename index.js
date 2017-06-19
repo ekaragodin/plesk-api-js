@@ -4,23 +4,20 @@ const {parseString, Builder} = require('xml2js');
 function api(config = {agentOptions: {}}) {
     // todo: check required attributes
 
-    return function (args = {}) {
+    return function (method, args = {}) {
         return new Promise((resolve, reject) => {
             const builder = new Builder();
-
-            args = {
-                packet: args,
-            };
+            const body = buildRequest(method, args);
 
             request({
                 method: 'POST',
                 url: buildUrl(config.url),
                 headers: buildHeaders(config),
-                body: builder.buildObject(args),
+                body: builder.buildObject(body),
                 agentOptions: config.agentOptions,
             }, (error, response, body) => {
                 if (!error && response.statusCode) {
-                    resolve(parseResponse(body));
+                    resolve(parseResponse(method, body));
                 } else {
                     reject(error || body);
                 }
@@ -46,7 +43,19 @@ function buildHeaders(config) {
     };
 }
 
-function parseResponse(response) {
+function buildRequest(method, args = {}) {
+    const packet = method.split('.').reduceRight((nested, key) => {
+        return {
+            [key]: nested
+        };
+    }, args);
+
+    return {
+        packet,
+    };
+}
+
+function parseResponse(method, response) {
     return new Promise((resolve, reject) =>{
         parseString(
             response,
@@ -58,16 +67,25 @@ function parseResponse(response) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(mapFromApi(result));
+                    resolve(mapFromApi(method, result));
                 }
             });
     });
 }
 
-function mapFromApi(data) {
-    delete data.packet.$;
+function mapFromApi(method, data) {
+    return get(`packet.${method}.result`, data);
+}
 
-    return data.packet;
+function get(path, object) {
+    const keys = path.split('.');
+    let index = 0;
+
+    while (object[keys[index]]) {
+        object = object[keys[index++]];
+    }
+
+    return object;
 }
 
 module.exports = {

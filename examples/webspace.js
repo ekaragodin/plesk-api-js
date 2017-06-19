@@ -1,18 +1,13 @@
-const config = require('./_config');
+const request = require('../index').api(require('./_config'));
 
-const request = require('../index').api(config);
-request({
-    webspace: {
-        get: {
-            filter: {},
-            dataset: {
-                hosting: {},
-            }
-        }
+request('webspace.get', {
+    filter: {},
+    dataset: {
+        hosting: {},
     }
 })
-.then((response) => {
-    console.log(response.webspace.get)
+.then((result) => {
+    console.log(result)
 })
 .catch((err) => {
     console.log(err)
