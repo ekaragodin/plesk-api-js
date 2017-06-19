@@ -1,17 +1,4 @@
-const config = {
-    url: {
-        protocol: 'https',
-        host: 'localhost',
-        port: 8443,
-    },
-    credentials: {
-        login: 'admin',
-        password: 'changeme',
-    },
-    agentOptions: {
-        rejectUnauthorized: false,
-    },
-};
+const config = require('./_config');
 
 const request = require('../index').api(config);
 request({
