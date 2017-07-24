@@ -1,11 +1,8 @@
-
 jest.mock('request');
 
 const config = {
     url: {
-        protocol: 'https',
         host: 'localhost',
-        port: 8443,
     },
     credentials: {
         login: 'admin',
@@ -70,5 +67,35 @@ test('convert xml to object', async () => {
         expect(response).toMatchObject({
             status: 'ok',
         });
+    });
+});
+
+test('url custom config', async () => {
+    const request = createRequestMock(getServerResponse);
+    const api = require('../index').api(
+        Object.assign({}, config, {
+            url: {
+                protocol: 'http',
+                host: 'localhost',
+                port: 8445,
+            }
+        })
+    );
+
+    return api('server.get', {
+        stat: {},
+    }).then(() => {
+        expect(request.mock.calls[0][0].url).toBe('http://localhost:8445/enterprise/control/agent.php');
+    });
+});
+
+test('url default config', async () => {
+    const request = createRequestMock(getServerResponse);
+    const api = require('../index').api(config);
+
+    return api('server.get', {
+        stat: {},
+    }).then(() => {
+        expect(request.mock.calls[0][0].url).toBe('https://localhost:8443/enterprise/control/agent.php');
     });
 });

@@ -4,7 +4,7 @@ request('webspace.get', {
     filter: {},
     dataset: {
         hosting: {},
-    }
+    },
 })
 .then((result) => {
     console.log(result)

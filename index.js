@@ -2,18 +2,18 @@ const request = require('request');
 const {parseString, Builder} = require('xml2js');
 
 function api(config = {agentOptions: {}}) {
-    // todo: check required attributes
-
     return function (method, args = {}) {
         return new Promise((resolve, reject) => {
             const builder = new Builder();
-            const body = buildRequest(method, args);
+            const body = builder.buildObject(
+                buildRequest(method, args)
+            );
 
             request({
                 method: 'POST',
                 url: buildUrl(config.url),
                 headers: buildHeaders(config),
-                body: builder.buildObject(body),
+                body,
                 agentOptions: config.agentOptions,
             }, (error, response, body) => {
                 if (!error && response.statusCode) {
@@ -26,8 +26,8 @@ function api(config = {agentOptions: {}}) {
     }
 }
 
-function buildUrl(config) {
-    return `${config.protocol}://${config.host}:${config.port}/enterprise/control/agent.php`;
+function buildUrl({host, protocol = 'https', port = 8443}) {
+    return `${protocol}://${host}:${port}/enterprise/control/agent.php`;
 }
 
 function buildHeaders(config) {
